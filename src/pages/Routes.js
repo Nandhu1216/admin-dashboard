@@ -15,7 +15,7 @@ function Routes() {
 
   const fetchRoutes = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/routes");
+      const res = await axios.get("https://patrolsense-backend.onrender.com/api/routes");
       setRoutes(res.data);
     } catch (err) {
       console.log(err);
@@ -25,7 +25,7 @@ function Routes() {
   // Delete route
   const deleteRoute = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/routes/${id}`);
+      await axios.delete(`https://patrolsense-backend.onrender.com/api/routes/${id}`);
       fetchRoutes(); // refresh list
     } catch (err) {
       console.log(err);

@@ -19,7 +19,7 @@ function Users() {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/users");
+      const res = await axios.get("https://patrolsense-backend.onrender.com/api/users");
       setUsers(res.data);
     } catch (err) {
       console.log(err);

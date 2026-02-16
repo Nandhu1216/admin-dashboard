@@ -23,7 +23,7 @@ function ViewRoute() {
 
         const fetchRoute = async () => {
             try {
-                const res = await axios.get(`http://localhost:5000/api/routes/${id}`);
+                const res = await axios.get(`https://patrolsense-backend.onrender.com/api/routes/${id}`);
                 setRoute(res.data);
             } catch (err) {
                 console.log(err);

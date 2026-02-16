@@ -22,24 +22,24 @@ function Assignments() {
   }, []);
 
   const fetchGuards = async () => {
-    const res = await axios.get("http://localhost:5000/api/users");
+    const res = await axios.get("https://patrolsense-backend.onrender.com/api/users");
     setGuards(res.data.filter(u => u.role === "guard"));
   };
 
   const fetchRoutes = async () => {
-    const res = await axios.get("http://localhost:5000/api/routes");
+    const res = await axios.get("https://patrolsense-backend.onrender.com/api/routes");
     setRoutes(res.data);
   };
 
   const fetchAssignments = async () => {
-    const res = await axios.get("http://localhost:5000/api/assignments");
+    const res = await axios.get("https://patrolsense-backend.onrender.com/api/assignments");
     setAssignments(res.data);
   };
 
   const createAssignment = async () => {
     try {
 
-      await axios.post("http://localhost:5000/api/assignments", form);
+      await axios.post("https://patrolsense-backend.onrender.com/api/assignments", form);
 
       fetchAssignments();
 
@@ -49,7 +49,7 @@ function Assignments() {
   };
 
   const deleteAssignment = async (id) => {
-    await axios.delete(`http://localhost:5000/api/assignments/${id}`);
+    await axios.delete(`https://patrolsense-backend.onrender.com/api/assignments/${id}`);
     fetchAssignments();
   };
 
