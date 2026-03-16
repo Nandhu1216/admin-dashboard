@@ -8,6 +8,7 @@ import Logs from "./pages/Logs";
 import Reports from "./pages/Reports";
 import CreateRoute from "./pages/CreateRoute";
 import ViewRoute from "./pages/ViewRoute";
+import CreatePlan from "./pages/CreatePlan";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="/routes/view/:id" element={<ViewRoute />} />
         <Route path="/users" element={<Users />} />
         <Route path="/assignments" element={<Assignments />} />
+        <Route path="/plans" element={<CreatePlan />} />
       </Routes>
     </Router>
   );
