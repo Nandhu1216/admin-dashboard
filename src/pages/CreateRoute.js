@@ -1,5 +1,5 @@
-import { GoogleMap, Marker, Polyline, useJsApiLoader } from "@react-google-maps/api";
-import { useState } from "react";
+import { GoogleMap, Marker, Polyline, Circle, useJsApiLoader } from "@react-google-maps/api";
+import { useState, Fragment } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -12,7 +12,6 @@ function CreateRoute() {
   const [routeName, setRouteName] = useState("");
   const [checkpoints, setCheckpoints] = useState([]);
 
-  // Stable center (prevents relocation bug)
   const [mapCenter] = useState({
     lat: 11.0168,
     lng: 76.9558
@@ -20,16 +19,19 @@ function CreateRoute() {
 
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: "AIzaSyD6C7mjOhiZFmQRZHryeCFIRSrtuEvehWU",
+    googleMapsApiKey: "YOUR_GOOGLE_MAPS_KEY",
     libraries
   });
 
   // Add checkpoint
   const handleMapClick = (e) => {
+
     const newPoint = {
       lat: e.latLng.lat(),
-      lng: e.latLng.lng()
+      lng: e.latLng.lng(),
+      radius: 5
     };
+
     setCheckpoints(prev => [...prev, newPoint]);
   };
 
@@ -38,7 +40,7 @@ function CreateRoute() {
     setCheckpoints(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Remove last checkpoint
+  // Undo last checkpoint
   const removeLastCheckpoint = () => {
     setCheckpoints(prev => prev.slice(0, -1));
   };
@@ -65,10 +67,13 @@ function CreateRoute() {
 
     try {
 
-      await axios.post("https://patrolsense-backend.onrender.com/api/routes", {
-        routeName,
-        checkpoints
-      });
+      await axios.post(
+        "https://patrolsense-backend.onrender.com/api/routes",
+        {
+          routeName,
+          checkpoints
+        }
+      );
 
       alert("Route Saved Successfully");
       navigate("/routes");
@@ -120,7 +125,7 @@ function CreateRoute() {
       <GoogleMap
         mapContainerStyle={{ width: "100%", height: "100%" }}
         center={mapCenter}
-        zoom={12}
+        zoom={15}
         onClick={handleMapClick}
       >
 
@@ -135,14 +140,32 @@ function CreateRoute() {
         )}
 
         {checkpoints.map((p, i) => (
-          <Marker
-            key={i}
-            position={p}
-            onClick={(e) => {
-              e.domEvent.stopPropagation();
-              removeCheckpoint(i);
-            }}
-          />
+          <Fragment key={i}>
+
+            {/* Marker */}
+            <Marker
+              position={p}
+              label={(i + 1).toString()}
+              onClick={(e) => {
+                e.domEvent.stopPropagation();
+                removeCheckpoint(i);
+              }}
+            />
+
+            {/* 5 meter detection circle */}
+            <Circle
+              center={p}
+              radius={p.radius}
+              options={{
+                fillColor: "#22c55e",
+                fillOpacity: 0.15,
+                strokeColor: "#22c55e",
+                strokeOpacity: 0.8,
+                strokeWeight: 1
+              }}
+            />
+
+          </Fragment>
         ))}
 
       </GoogleMap>
