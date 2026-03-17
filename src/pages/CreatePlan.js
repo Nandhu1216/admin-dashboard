@@ -73,7 +73,6 @@ function CreatePlan() {
       );
 
       alert("Plan Created Successfully");
-
       navigate("/plans");
 
     } catch (err) {
@@ -84,7 +83,7 @@ function CreatePlan() {
 
   return (
 
-    <div style={{ height: "100vh", padding: "20px", marginLeft: "220px" }}>
+    <div style={{ padding: "20px" }}>
 
       {/* TOP BAR */}
       <div style={topBar}>
@@ -112,7 +111,7 @@ function CreatePlan() {
 
 
       {/* AVAILABLE ROUTES */}
-      <div style={{ marginTop: 80 }}>
+      <div style={{ marginTop: 20 }}>
 
         <h3>Available Routes</h3>
 
@@ -163,24 +162,11 @@ function CreatePlan() {
 }
 
 
-/* ROW STYLE */
-
-const routeRow = {
-  display: "flex",
-  justifyContent: "space-between",
-  marginBottom: 10,
-  padding: 10,
-  background: "#f1f5f9",
-  borderRadius: 6
-};
-
-
-/* SHARED STYLES */
+/* STYLES */
 
 const topBar = {
-  position: "absolute",
-  top: 10,
-  left: 240,
+  position: "sticky",
+  top: 0,
   background: "#1e293b",
   padding: "12px",
   borderRadius: "10px",
@@ -188,6 +174,16 @@ const topBar = {
   gap: "10px",
   alignItems: "center",
   zIndex: 10
+};
+
+const routeRow = {
+  display: "flex",
+  justifyContent: "space-between",
+  marginBottom: 10,
+  padding: 12,
+  background: "#1e293b",
+  borderRadius: 8,
+  color: "white"
 };
 
 const backBtn = {
