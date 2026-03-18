@@ -189,15 +189,6 @@ const topBar = {
   zIndex: 10
 };
 
-const backBtn = {
-  padding: "8px 14px",
-  border: "none",
-  background: "#475569",
-  color: "white",
-  borderRadius: "6px",
-  cursor: "pointer"
-};
-
 const inputStyle = {
   padding: "8px",
   borderRadius: "6px",
