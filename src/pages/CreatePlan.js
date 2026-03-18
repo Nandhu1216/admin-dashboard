@@ -1,10 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 function CreatePlan() {
-
-  const navigate = useNavigate();
 
   const [planName, setPlanName] = useState("");
   const [routes, setRoutes] = useState([]);
@@ -73,7 +70,9 @@ function CreatePlan() {
       );
 
       alert("Plan Created Successfully");
-      navigate("/plans");
+
+      setPlanName("");
+      setSelectedRoutes([]);
 
     } catch (err) {
       console.log(err);
@@ -83,146 +82,143 @@ function CreatePlan() {
 
   return (
 
-  <div style={{ padding: "20px" }}>
+    <div>
 
-    {/* TOP BAR */}
-    <div style={topBar}>
+      <h2 style={title}>Create Patrol Plan</h2>
 
-      <h3 style={{ color: "white", marginRight: "10px" }}>
-        Create Patrol Plan
-      </h3>
+      {/* PLAN NAME */}
+      <div style={card}>
+        <label>Plan Name</label>
+        <input
+          value={planName}
+          onChange={(e) => setPlanName(e.target.value)}
+          placeholder="Enter plan name"
+          style={input}
+        />
+      </div>
 
-      <input
-        placeholder="Plan Name"
-        value={planName}
-        onChange={(e) => setPlanName(e.target.value)}
-        style={inputStyle}
-      />
+      {/* MAIN GRID */}
+      <div style={grid}>
 
-      <button onClick={savePlan} style={saveBtn}>
+        {/* AVAILABLE ROUTES */}
+        <div style={card}>
+          <h3 style={section}>Available Routes</h3>
+
+          {routes.map((r) => (
+            <div key={r._id} style={row}>
+
+              <span>{r.routeName}</span>
+
+              <button onClick={() => addRoute(r)} style={addBtn}>
+                Add
+              </button>
+
+            </div>
+          ))}
+
+        </div>
+
+        {/* SELECTED ROUTES */}
+        <div style={card}>
+          <h3 style={section}>
+            Routes in Plan ({selectedRoutes.length})
+          </h3>
+
+          {selectedRoutes.map((r, i) => (
+            <div key={i} style={row}>
+
+              <span>
+                {r.order}. {r.routeName}
+              </span>
+
+              <button onClick={() => removeRoute(i)} style={removeBtn}>
+                Remove
+              </button>
+
+            </div>
+          ))}
+
+        </div>
+
+      </div>
+
+      {/* SAVE BUTTON */}
+      <button onClick={savePlan} style={mainBtn}>
         Save Plan
       </button>
 
-      <div style={countText}>
-        Routes: {selectedRoutes.length}
-      </div>
-
     </div>
-
-
-    {/* AVAILABLE ROUTES */}
-    <div style={{ marginTop: 20 }}>
-
-      <h3>Available Routes</h3>
-
-      {routes.map((r) => (
-        <div key={r._id} style={routeRow}>
-
-          <span>{r.routeName}</span>
-
-          <button
-            onClick={() => addRoute(r)}
-            style={warnBtn}
-          >
-            Add
-          </button>
-
-        </div>
-      ))}
-
-    </div>
-
-
-    {/* ROUTES IN PLAN */}
-    <div style={{ marginTop: 30 }}>
-
-      <h3>Routes in Plan</h3>
-
-      {selectedRoutes.map((r, i) => (
-        <div key={i} style={routeRow}>
-
-          <span>
-            {r.order}. {r.routeName}
-          </span>
-
-          <button
-            onClick={() => removeRoute(i)}
-            style={dangerBtn}
-          >
-            Remove
-          </button>
-
-        </div>
-      ))}
-
-    </div>
-
-  </div>
-);
+  );
 }
 
 
 /* STYLES */
 
-const topBar = {
-  position: "sticky",
-  top: 0,
-  background: "#1e293b",
-  padding: "12px",
-  borderRadius: "10px",
-  display: "flex",
-  gap: "10px",
-  alignItems: "center",
-  zIndex: 10
+const title = {
+  marginBottom: "20px"
 };
 
-const routeRow = {
+const card = {
+  background: "#1e293b",
+  padding: "20px",
+  borderRadius: "12px",
+  marginBottom: "20px"
+};
+
+const section = {
+  marginBottom: "10px",
+  color: "#cbd5f5"
+};
+
+const grid = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr",
+  gap: "20px"
+};
+
+const row = {
   display: "flex",
   justifyContent: "space-between",
-  marginBottom: 10,
-  padding: 12,
-  background: "#1e293b",
-  borderRadius: 8,
-  color: "white"
+  padding: "10px",
+  background: "#334155",
+  borderRadius: "6px",
+  marginBottom: "10px"
 };
 
-const inputStyle = {
-  padding: "8px",
+const input = {
+  width: "100%",
+  padding: "10px",
   borderRadius: "6px",
   border: "none",
-  width: "180px"
+  marginTop: "5px"
 };
 
-const saveBtn = {
-  padding: "8px 14px",
-  border: "none",
+const addBtn = {
   background: "#22c55e",
+  border: "none",
   color: "white",
+  padding: "6px 10px",
   borderRadius: "6px",
   cursor: "pointer"
 };
 
-const warnBtn = {
-  padding: "8px 14px",
-  border: "none",
-  background: "#f59e0b",
-  color: "white",
-  borderRadius: "6px",
-  cursor: "pointer"
-};
-
-const dangerBtn = {
-  padding: "8px 14px",
-  border: "none",
+const removeBtn = {
   background: "#ef4444",
+  border: "none",
   color: "white",
+  padding: "6px 10px",
   borderRadius: "6px",
   cursor: "pointer"
 };
 
-const countText = {
+const mainBtn = {
+  padding: "12px",
+  background: "#22c55e",
+  border: "none",
   color: "white",
-  fontWeight: "bold"
+  borderRadius: "8px",
+  cursor: "pointer",
+  fontSize: "16px"
 };
 
 export default CreatePlan;

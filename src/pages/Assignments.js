@@ -21,14 +21,17 @@ function Assignments() {
   }, []);
 
   const fetchData = async () => {
+    try {
+      const usersRes = await axios.get("https://patrolsense-backend.onrender.com/api/users");
+      const routesRes = await axios.get("https://patrolsense-backend.onrender.com/api/routes");
+      const plansRes = await axios.get("https://patrolsense-backend.onrender.com/api/plans");
 
-    const usersRes = await axios.get("https://patrolsense-backend.onrender.com/api/users");
-    const routesRes = await axios.get("https://patrolsense-backend.onrender.com/api/routes");
-    const plansRes = await axios.get("https://patrolsense-backend.onrender.com/api/plans");
-
-    setGuards(usersRes.data.filter(u => u.role === "guard"));
-    setRoutes(routesRes.data);
-    setPlans(plansRes.data);
+      setGuards(usersRes.data.filter(u => u.role === "guard"));
+      setRoutes(routesRes.data);
+      setPlans(plansRes.data);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const createAssignment = async () => {
@@ -47,13 +50,19 @@ function Assignments() {
     };
 
     try {
-
       await axios.post(
         "https://patrolsense-backend.onrender.com/api/assignments",
         payload
       );
 
       alert("Assignment Created");
+
+      // reset
+      setGuardId("");
+      setDate("");
+      setShift("morning");
+      setPlanId("");
+      setRouteId("");
 
     } catch (err) {
       console.log(err);
@@ -63,80 +72,83 @@ function Assignments() {
 
   return (
 
-    <div style={{ padding: 20 }}>
+    <div>
 
-      <h2>Create Assignment</h2>
+      <h2 style={title}>Create Assignment</h2>
 
-      <div style={row}>
-        <label>Guard</label>
-        <select onChange={(e) => setGuardId(e.target.value)}>
-          <option>Select Guard</option>
-          {guards.map(g => (
-            <option key={g._id} value={g._id}>
-              {g.name}
-            </option>
-          ))}
-        </select>
+      {/* BASIC INFO */}
+      <div style={card}>
+
+        <h3 style={section}>Basic Info</h3>
+
+        <div style={grid}>
+
+          <div>
+            <label>Guard</label>
+            <select value={guardId} onChange={(e) => setGuardId(e.target.value)} style={input}>
+              <option value="">Select Guard</option>
+              {guards.map(g => (
+                <option key={g._id} value={g._id}>{g.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label>Date</label>
+            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} style={input}/>
+          </div>
+
+          <div>
+            <label>Shift</label>
+            <select value={shift} onChange={(e) => setShift(e.target.value)} style={input}>
+              <option value="morning">Morning</option>
+              <option value="evening">Evening</option>
+              <option value="night">Night</option>
+            </select>
+          </div>
+
+        </div>
+
       </div>
 
-      <div style={row}>
-        <label>Date</label>
-        <input type="date" onChange={(e) => setDate(e.target.value)} />
-      </div>
+      {/* TYPE */}
+      <div style={card}>
 
-      <div style={row}>
-        <label>Shift</label>
-        <select onChange={(e) => setShift(e.target.value)}>
-          <option value="morning">Morning</option>
-          <option value="evening">Evening</option>
-          <option value="night">Night</option>
-        </select>
-      </div>
+        <h3 style={section}>Assignment Type</h3>
 
-      <div style={row}>
-        <label>Assignment Type</label>
-
-        <select
-          onChange={(e) => setAssignmentType(e.target.value)}
-        >
+        <select value={assignmentType} onChange={(e) => setAssignmentType(e.target.value)} style={input}>
           <option value="plan">Patrol Plan</option>
           <option value="route">Single Route</option>
         </select>
+
       </div>
 
-      {assignmentType === "plan" && (
-        <div style={row}>
-          <label>Select Plan</label>
-          <select onChange={(e) => setPlanId(e.target.value)}>
-            <option>Select Plan</option>
+      {/* SELECTION */}
+      <div style={card}>
 
+        <h3 style={section}>Selection</h3>
+
+        {assignmentType === "plan" && (
+          <select value={planId} onChange={(e) => setPlanId(e.target.value)} style={input}>
+            <option value="">Select Plan</option>
             {plans.map(p => (
-              <option key={p._id} value={p._id}>
-                {p.planName}
-              </option>
+              <option key={p._id} value={p._id}>{p.planName}</option>
             ))}
-
           </select>
-        </div>
-      )}
+        )}
 
-      {assignmentType === "route" && (
-        <div style={row}>
-          <label>Select Route</label>
-
-          <select onChange={(e) => setRouteId(e.target.value)}>
-            <option>Select Route</option>
-
+        {assignmentType === "route" && (
+          <select value={routeId} onChange={(e) => setRouteId(e.target.value)} style={input}>
+            <option value="">Select Route</option>
             {routes.map(r => (
-              <option key={r._id} value={r._id}>
-                {r.routeName}
-              </option>
+              <option key={r._id} value={r._id}>{r.routeName}</option>
             ))}
-
           </select>
-        </div>
-      )}
+        )}
 
+      </div>
+
+      {/* BUTTON */}
       <button onClick={createAssignment} style={btn}>
         Create Assignment
       </button>
@@ -145,20 +157,47 @@ function Assignments() {
   );
 }
 
-const row = {
-  marginBottom: "15px",
-  display: "flex",
-  gap: "10px",
-  alignItems: "center"
+
+/* STYLES */
+
+const title = {
+  marginBottom: "20px"
+};
+
+const card = {
+  background: "#1e293b",
+  padding: "20px",
+  borderRadius: "12px",
+  marginBottom: "20px"
+};
+
+const section = {
+  marginBottom: "10px",
+  color: "#cbd5f5"
+};
+
+const grid = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr 1fr",
+  gap: "15px"
+};
+
+const input = {
+  width: "100%",
+  padding: "10px",
+  borderRadius: "6px",
+  border: "none",
+  marginTop: "5px"
 };
 
 const btn = {
-  padding: "10px 16px",
+  padding: "12px",
   background: "#22c55e",
   border: "none",
   color: "white",
-  borderRadius: "6px",
-  cursor: "pointer"
+  borderRadius: "8px",
+  cursor: "pointer",
+  fontSize: "16px"
 };
 
 export default Assignments;

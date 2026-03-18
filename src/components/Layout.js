@@ -6,49 +6,81 @@ function Layout() {
   const [open, setOpen] = useState(true);
 
   return (
-    <div>
+    <div style={wrapper}>
 
-      {/* Top Navbar */}
-      <div style={{
-        height: "60px",
-        background: "#1e293b",
-        color: "white",
-        display: "flex",
-        alignItems: "center",
-        padding: "0 20px"
-      }}>
-        <button
-          onClick={() => setOpen(!open)}
-          style={{
-            fontSize: "24px",
-            background: "none",
-            border: "none",
-            color: "white",
-            cursor: "pointer"
-          }}
-        >
+      {/* NAVBAR */}
+      <div style={navbar}>
+
+        <button onClick={() => setOpen(!open)} style={menuBtn}>
           ☰
         </button>
 
-        <h2 style={{ marginLeft: "20px" }}>PatrolSense</h2>
+        <h2 style={logo}>PatrolSense</h2>
+
       </div>
 
-      {/* Sidebar */}
-      {open && <Sidebar />}
+      {/* MAIN AREA */}
+      <div style={main}>
 
-      {/* Page Content */}
-      <div style={{
-        marginLeft: open ? "220px" : "0px",
-        padding: "20px",
-        background: "#0f172a",
-        minHeight: "100vh",
-        color: "white"
-      }}>
-        <Outlet />
+        {/* SIDEBAR */}
+        {open && <Sidebar />}
+
+        {/* CONTENT */}
+        <div
+          style={{
+            ...content,
+            marginLeft: open ? "220px" : "0px"
+          }}
+        >
+          <Outlet />
+        </div>
+
       </div>
 
     </div>
   );
 }
+
+/* STYLES */
+
+const wrapper = {
+  background: "#0f172a",
+  minHeight: "100vh",
+  color: "white"
+};
+
+const navbar = {
+  height: "60px",
+  background: "#1e293b",
+  display: "flex",
+  alignItems: "center",
+  padding: "0 20px",
+  position: "sticky",
+  top: 0,
+  zIndex: 100
+};
+
+const menuBtn = {
+  fontSize: "22px",
+  background: "none",
+  border: "none",
+  color: "white",
+  cursor: "pointer"
+};
+
+const logo = {
+  marginLeft: "15px",
+  fontWeight: "bold"
+};
+
+const main = {
+  display: "flex"
+};
+
+const content = {
+  flex: 1,
+  padding: "20px",
+  transition: "all 0.3s ease"
+};
 
 export default Layout;

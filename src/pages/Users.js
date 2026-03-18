@@ -1,4 +1,3 @@
-import Layout from "../components/Layout";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -19,7 +18,9 @@ function Users() {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get("https://patrolsense-backend.onrender.com/api/users");
+      const res = await axios.get(
+        "https://patrolsense-backend.onrender.com/api/users"
+      );
       setUsers(res.data);
     } catch (err) {
       console.log(err);
@@ -29,7 +30,10 @@ function Users() {
   const addUser = async () => {
     try {
 
-      await axios.post("http://localhost:5000/api/users", form);
+      await axios.post(
+        "https://patrolsense-backend.onrender.com/api/users",
+        form
+      );
 
       setForm({
         name: "",
@@ -40,14 +44,16 @@ function Users() {
 
       fetchUsers();
 
-    } catch (err) {
+    } catch {
       alert("Error adding user");
     }
   };
 
   const deleteUser = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/users/${id}`);
+      await axios.delete(
+        `https://patrolsense-backend.onrender.com/api/users/${id}`
+      );
       fetchUsers();
     } catch (err) {
       console.log(err);
@@ -55,43 +61,50 @@ function Users() {
   };
 
   return (
-    <Layout>
 
-      <h1 style={{ color: "white" }}>Users</h1>
+    <div>
 
-      {/* ADD USER FORM */}
-      <div style={formBox}>
+      <h2 style={title}>Users</h2>
 
-        <input
-          placeholder="Name"
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-          style={input}
-        />
+      {/* ADD USER */}
+      <div style={card}>
 
-        <input
-          placeholder="Employee ID"
-          value={form.employeeId}
-          onChange={(e) => setForm({ ...form, employeeId: e.target.value })}
-          style={input}
-        />
+        <h3 style={section}>Add User</h3>
 
-        <input
-          placeholder="Password"
-          type="password"
-          value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
-          style={input}
-        />
+        <div style={grid}>
 
-        <select
-          value={form.role}
-          onChange={(e) => setForm({ ...form, role: e.target.value })}
-          style={input}
-        >
-          <option value="guard">Guard</option>
-          <option value="supervisor">Supervisor</option>
-        </select>
+          <input
+            placeholder="Name"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            style={input}
+          />
+
+          <input
+            placeholder="Employee ID"
+            value={form.employeeId}
+            onChange={(e) => setForm({ ...form, employeeId: e.target.value })}
+            style={input}
+          />
+
+          <input
+            placeholder="Password"
+            type="password"
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            style={input}
+          />
+
+          <select
+            value={form.role}
+            onChange={(e) => setForm({ ...form, role: e.target.value })}
+            style={input}
+          >
+            <option value="guard">Guard</option>
+            <option value="supervisor">Supervisor</option>
+          </select>
+
+        </div>
 
         <button onClick={addUser} style={addBtn}>
           Add User
@@ -100,13 +113,18 @@ function Users() {
       </div>
 
       {/* USERS LIST */}
-      <div style={{ marginTop: "20px" }}>
+      <div style={card}>
+
+        <h3 style={section}>All Users</h3>
+
         {users.map((user) => (
-          <div key={user._id} style={userCard}>
+          <div key={user._id} style={row}>
 
             <div>
-              <h3>{user.name}</h3>
-              <p>{user.employeeId} • {user.role}</p>
+              <strong>{user.name}</strong>
+              <div style={subText}>
+                {user.employeeId} • {user.role}
+              </div>
             </div>
 
             <button
@@ -118,21 +136,37 @@ function Users() {
 
           </div>
         ))}
+
       </div>
 
-    </Layout>
+    </div>
   );
 }
 
+
 /* STYLES */
 
-const formBox = {
+const title = {
+  marginBottom: "20px"
+};
+
+const card = {
   background: "#1e293b",
   padding: "20px",
-  borderRadius: "10px",
-  display: "flex",
+  borderRadius: "12px",
+  marginBottom: "20px"
+};
+
+const section = {
+  marginBottom: "10px",
+  color: "#cbd5f5"
+};
+
+const grid = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr",
   gap: "10px",
-  flexWrap: "wrap"
+  marginBottom: "10px"
 };
 
 const input = {
@@ -144,26 +178,31 @@ const input = {
 const addBtn = {
   background: "#22c55e",
   border: "none",
-  padding: "10px 16px",
+  padding: "10px",
   borderRadius: "6px",
   color: "white",
   cursor: "pointer"
 };
 
-const userCard = {
-  background: "#1e293b",
-  padding: "15px",
-  borderRadius: "8px",
-  marginBottom: "10px",
+const row = {
   display: "flex",
   justifyContent: "space-between",
-  color: "white"
+  alignItems: "center",
+  background: "#334155",
+  padding: "10px",
+  borderRadius: "6px",
+  marginBottom: "10px"
+};
+
+const subText = {
+  fontSize: "12px",
+  color: "#94a3b8"
 };
 
 const deleteBtn = {
   background: "#ef4444",
   border: "none",
-  padding: "8px 14px",
+  padding: "6px 10px",
   borderRadius: "6px",
   color: "white",
   cursor: "pointer"
