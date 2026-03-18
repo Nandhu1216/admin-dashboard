@@ -83,82 +83,82 @@ function CreatePlan() {
 
   return (
 
-    <div style={{ padding: "20px" }}>
+  <div style={{ padding: "20px" }}>
 
-      {/* TOP BAR */}
-      <div style={topBar}>
+    {/* TOP BAR */}
+    <div style={topBar}>
 
-        <button onClick={() => navigate("/plans")} style={backBtn}>
-          ← Back
-        </button>
+      <h3 style={{ color: "white", marginRight: "10px" }}>
+        Create Patrol Plan
+      </h3>
 
-        <input
-          placeholder="Plan Name"
-          value={planName}
-          onChange={(e) => setPlanName(e.target.value)}
-          style={inputStyle}
-        />
+      <input
+        placeholder="Plan Name"
+        value={planName}
+        onChange={(e) => setPlanName(e.target.value)}
+        style={inputStyle}
+      />
 
-        <button onClick={savePlan} style={saveBtn}>
-          Save Plan
-        </button>
+      <button onClick={savePlan} style={saveBtn}>
+        Save Plan
+      </button>
 
-        <div style={countText}>
-          Routes: {selectedRoutes.length}
-        </div>
-
-      </div>
-
-
-      {/* AVAILABLE ROUTES */}
-      <div style={{ marginTop: 20 }}>
-
-        <h3>Available Routes</h3>
-
-        {routes.map((r) => (
-          <div key={r._id} style={routeRow}>
-
-            <span>{r.routeName}</span>
-
-            <button
-              onClick={() => addRoute(r)}
-              style={warnBtn}
-            >
-              Add
-            </button>
-
-          </div>
-        ))}
-
-      </div>
-
-
-      {/* ROUTES IN PLAN */}
-      <div style={{ marginTop: 30 }}>
-
-        <h3>Routes in Plan</h3>
-
-        {selectedRoutes.map((r, i) => (
-          <div key={i} style={routeRow}>
-
-            <span>
-              {r.order}. {r.routeName}
-            </span>
-
-            <button
-              onClick={() => removeRoute(i)}
-              style={dangerBtn}
-            >
-              Remove
-            </button>
-
-          </div>
-        ))}
-
+      <div style={countText}>
+        Routes: {selectedRoutes.length}
       </div>
 
     </div>
-  );
+
+
+    {/* AVAILABLE ROUTES */}
+    <div style={{ marginTop: 20 }}>
+
+      <h3>Available Routes</h3>
+
+      {routes.map((r) => (
+        <div key={r._id} style={routeRow}>
+
+          <span>{r.routeName}</span>
+
+          <button
+            onClick={() => addRoute(r)}
+            style={warnBtn}
+          >
+            Add
+          </button>
+
+        </div>
+      ))}
+
+    </div>
+
+
+    {/* ROUTES IN PLAN */}
+    <div style={{ marginTop: 30 }}>
+
+      <h3>Routes in Plan</h3>
+
+      {selectedRoutes.map((r, i) => (
+        <div key={i} style={routeRow}>
+
+          <span>
+            {r.order}. {r.routeName}
+          </span>
+
+          <button
+            onClick={() => removeRoute(i)}
+            style={dangerBtn}
+          >
+            Remove
+          </button>
+
+        </div>
+      ))}
+
+    </div>
+
+  </div>
+);
 }
 
 

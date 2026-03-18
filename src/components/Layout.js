@@ -1,8 +1,9 @@
 import { useState } from "react";
 import Sidebar from "./Sidebar";
+import { Outlet } from "react-router-dom";
 
-function Layout({ children }) {
-  const [open, setOpen] = useState(false);
+function Layout() {
+  const [open, setOpen] = useState(true);
 
   return (
     <div>
@@ -37,12 +38,13 @@ function Layout({ children }) {
 
       {/* Page Content */}
       <div style={{
+        marginLeft: open ? "220px" : "0px",
         padding: "20px",
         background: "#0f172a",
         minHeight: "100vh",
         color: "white"
       }}>
-        {children}
+        <Outlet />
       </div>
 
     </div>

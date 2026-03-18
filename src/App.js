@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
+import Layout from "./components/Layout";
+
 import Login from "./pages/Login";
 import RoutesPage from "./pages/Routes";
 import Users from "./pages/Users";
@@ -14,20 +16,27 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Login Page */}
+
+        {/* Login (outside layout) */}
         <Route path="/" element={<Login />} />
 
-        {/* Main App Pages */}
-        <Route path="/routes" element={<RoutesPage />} />
-        <Route path="/users" element={<Users />} />
-        <Route path="/assignments" element={<Assignments />} />
-        <Route path="/logs" element={<Logs />} />
-        <Route path="/reports" element={<Reports />} />
-        <Route path="/routes/create" element={<CreateRoute />} />
-        <Route path="/routes/view/:id" element={<ViewRoute />} />
-        <Route path="/users" element={<Users />} />
-        <Route path="/assignments" element={<Assignments />} />
-        <Route path="/plans" element={<CreatePlan />} />
+        {/* Dashboard (inside layout) */}
+        <Route element={<Layout />}>
+
+          <Route path="/routes" element={<RoutesPage />} />
+          <Route path="/routes/create" element={<CreateRoute />} />
+          <Route path="/routes/view/:id" element={<ViewRoute />} />
+
+          <Route path="/users" element={<Users />} />
+          <Route path="/assignments" element={<Assignments />} />
+
+          <Route path="/logs" element={<Logs />} />
+          <Route path="/reports" element={<Reports />} />
+
+          <Route path="/plans" element={<CreatePlan />} />
+
+        </Route>
+
       </Routes>
     </Router>
   );
