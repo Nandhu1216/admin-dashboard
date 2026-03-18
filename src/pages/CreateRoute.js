@@ -19,7 +19,7 @@ function CreateRoute() {
 
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: "YOUR_GOOGLE_MAPS_KEY",
+    googleMapsApiKey: "AIzaSyD6C7mjOhiZFmQRZHryeCFIRSrtuEvehWU",
     libraries
   });
 
