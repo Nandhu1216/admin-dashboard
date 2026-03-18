@@ -92,6 +92,10 @@ function CreateRoute() {
       {/* TOP BAR */}
       <div style={topBar}>
 
+        <button onClick={() => navigate("/routes")} style={backBtn}>
+          ← Back
+        </button>
+
         <input
           placeholder="Route Name"
           value={routeName}
@@ -183,6 +187,15 @@ const topBar = {
   gap: "10px",
   alignItems: "center",
   zIndex: 10
+};
+
+const backBtn = {
+  padding: "8px 14px",
+  border: "none",
+  background: "#475569",
+  color: "white",
+  borderRadius: "6px",
+  cursor: "pointer"
 };
 
 const inputStyle = {
