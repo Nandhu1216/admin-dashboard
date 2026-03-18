@@ -92,10 +92,6 @@ function CreateRoute() {
       {/* TOP BAR */}
       <div style={topBar}>
 
-        <button onClick={() => navigate("/routes")} style={backBtn}>
-          ← Back
-        </button>
-
         <input
           placeholder="Route Name"
           value={routeName}
