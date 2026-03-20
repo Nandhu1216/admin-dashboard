@@ -8,6 +8,8 @@ function CreatePlan() {
   const [routes, setRoutes] = useState([]);
 
   const [isCreating, setIsCreating] = useState(false);
+  const [viewPlan, setViewPlan] = useState(null);
+  const [editPlan, setEditPlan] = useState(null);
 
   const [planName, setPlanName] = useState("");
   const [selectedRoutes, setSelectedRoutes] = useState([]);
@@ -35,6 +37,8 @@ function CreatePlan() {
     }
   };
 
+  // ================= ROUTES =================
+
   const addRoute = (route) => {
     if (selectedRoutes.find(r => r.routeId === route._id)) return;
 
@@ -56,6 +60,8 @@ function CreatePlan() {
     })));
   };
 
+  // ================= CREATE =================
+
   const savePlan = async () => {
 
     if (!planName.trim() || selectedRoutes.length === 0) {
@@ -70,18 +76,72 @@ function CreatePlan() {
       });
 
       alert("Plan created");
-
-      setPlanName("");
-      setSelectedRoutes([]);
-      setIsCreating(false);
-
-      fetchPlans();
+      resetAll();
 
     } catch (err) {
       console.log(err);
       alert("Error creating plan");
     }
   };
+
+  // ================= EDIT =================
+
+  const startEdit = (plan) => {
+    setEditPlan(plan);
+    setPlanName(plan.planName);
+    setSelectedRoutes(plan.routes);
+  };
+
+  const updatePlan = async () => {
+    try {
+      await axios.put(
+        `https://patrolsense-backend.onrender.com/api/plans/${editPlan._id}`,
+        {
+          planName,
+          routes: selectedRoutes
+        }
+      );
+
+      alert("Plan updated");
+      resetAll();
+
+    } catch (err) {
+      console.log(err);
+      alert("Error updating plan");
+    }
+  };
+
+  // ================= DELETE =================
+
+  const deletePlan = async (id) => {
+
+    if (!window.confirm("Delete this plan?")) return;
+
+    try {
+      await axios.delete(
+        `https://patrolsense-backend.onrender.com/api/plans/${id}`
+      );
+
+      fetchPlans();
+
+    } catch (err) {
+      console.log(err);
+      alert("Error deleting plan");
+    }
+  };
+
+  // ================= RESET =================
+
+  const resetAll = () => {
+    setPlanName("");
+    setSelectedRoutes([]);
+    setIsCreating(false);
+    setEditPlan(null);
+    setViewPlan(null);
+    fetchPlans();
+  };
+
+  // ================= UI =================
 
   return (
 
@@ -91,8 +151,8 @@ function CreatePlan() {
 
         <h2 style={title}>Patrol Plans</h2>
 
-        {/* LIST VIEW */}
-        {!isCreating && (
+        {/* ================= LIST ================= */}
+        {!isCreating && !viewPlan && !editPlan && (
 
           <div>
 
@@ -103,15 +163,35 @@ function CreatePlan() {
             <div style={{ marginTop: 20 }}>
 
               {plans.length === 0 && (
-                <p style={subText}>No plans created yet</p>
+                <p style={subText}>No plans available</p>
               )}
 
               {plans.map(p => (
                 <div key={p._id} style={card}>
-                  <strong>{p.planName}</strong>
-                  <div style={subText}>
-                    {p.routes?.length || 0} routes
+
+                  <div>
+                    <strong>{p.planName}</strong>
+                    <div style={subText}>
+                      {p.routes?.length || 0} routes
+                    </div>
                   </div>
+
+                  <div style={{ display: "flex", gap: "10px" }}>
+
+                    <button onClick={() => setViewPlan(p)} style={viewBtn}>
+                      View
+                    </button>
+
+                    <button onClick={() => startEdit(p)} style={editBtn}>
+                      Edit
+                    </button>
+
+                    <button onClick={() => deletePlan(p._id)} style={deleteBtn}>
+                      Delete
+                    </button>
+
+                  </div>
+
                 </div>
               ))}
 
@@ -121,27 +201,46 @@ function CreatePlan() {
 
         )}
 
-        {/* CREATE VIEW */}
-        {isCreating && (
+        {/* ================= VIEW ================= */}
+        {viewPlan && (
 
           <div>
 
-            <button onClick={() => setIsCreating(false)} style={backBtn}>
+            <button onClick={() => setViewPlan(null)} style={backBtn}>
               ← Back
             </button>
 
-            <div style={card}>
-              <input
-                placeholder="Plan Name"
-                value={planName}
-                onChange={(e) => setPlanName(e.target.value)}
-                style={input}
-              />
-            </div>
+            <h3>{viewPlan.planName}</h3>
+
+            {viewPlan.routes.map((r, i) => (
+              <div key={i} style={row}>
+                {i + 1}. {r.routeName}
+              </div>
+            ))}
+
+          </div>
+
+        )}
+
+        {/* ================= CREATE / EDIT ================= */}
+        {(isCreating || editPlan) && (
+
+          <div>
+
+            <button onClick={resetAll} style={backBtn}>
+              ← Back
+            </button>
+
+            <input
+              placeholder="Plan Name"
+              value={planName}
+              onChange={(e) => setPlanName(e.target.value)}
+              style={input}
+            />
 
             <div style={grid}>
 
-              {/* AVAILABLE ROUTES */}
+              {/* AVAILABLE */}
               <div style={card}>
                 <h3 style={section}>Available Routes</h3>
 
@@ -156,7 +255,7 @@ function CreatePlan() {
 
               </div>
 
-              {/* SELECTED ROUTES */}
+              {/* SELECTED */}
               <div style={card}>
                 <h3 style={section}>
                   Selected ({selectedRoutes.length})
@@ -164,7 +263,7 @@ function CreatePlan() {
 
                 {selectedRoutes.map((r, i) => (
                   <div key={i} style={row}>
-                    <span>{r.order}. {r.routeName}</span>
+                    <span>{i + 1}. {r.routeName}</span>
                     <button onClick={() => removeRoute(i)} style={removeBtn}>
                       Remove
                     </button>
@@ -175,8 +274,11 @@ function CreatePlan() {
 
             </div>
 
-            <button onClick={savePlan} style={mainBtn}>
-              Save Plan
+            <button
+              onClick={editPlan ? updatePlan : savePlan}
+              style={mainBtn}
+            >
+              {editPlan ? "Update Plan" : "Save Plan"}
             </button>
 
           </div>
@@ -206,7 +308,10 @@ const card = {
   background: "#1e293b",
   padding: "15px",
   borderRadius: "10px",
-  marginBottom: "10px"
+  marginBottom: "10px",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center"
 };
 
 const grid = {
@@ -228,7 +333,8 @@ const input = {
   width: "100%",
   padding: "10px",
   borderRadius: "6px",
-  border: "none"
+  border: "none",
+  marginBottom: "10px"
 };
 
 const addBtn = {
@@ -272,6 +378,33 @@ const backBtn = {
 const subText = {
   fontSize: "12px",
   color: "#94a3b8"
+};
+
+const viewBtn = {
+  background: "#3b82f6",
+  border: "none",
+  color: "white",
+  padding: "6px 10px",
+  borderRadius: "6px",
+  cursor: "pointer"
+};
+
+const editBtn = {
+  background: "#f59e0b",
+  border: "none",
+  color: "white",
+  padding: "6px 10px",
+  borderRadius: "6px",
+  cursor: "pointer"
+};
+
+const deleteBtn = {
+  background: "#ef4444",
+  border: "none",
+  color: "white",
+  padding: "6px 10px",
+  borderRadius: "6px",
+  cursor: "pointer"
 };
 
 export default CreatePlan;
