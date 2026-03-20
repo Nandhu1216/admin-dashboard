@@ -18,13 +18,21 @@ function CreatePlan() {
   }, []);
 
   const fetchPlans = async () => {
-    const res = await axios.get("https://patrolsense-backend.onrender.com/api/plans");
-    setPlans(res.data);
+    try {
+      const res = await axios.get("https://patrolsense-backend.onrender.com/api/plans");
+      setPlans(res.data);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const fetchRoutes = async () => {
-    const res = await axios.get("https://patrolsense-backend.onrender.com/api/routes");
-    setRoutes(res.data);
+    try {
+      const res = await axios.get("https://patrolsense-backend.onrender.com/api/routes");
+      setRoutes(res.data);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const addRoute = (route) => {
@@ -42,28 +50,37 @@ function CreatePlan() {
 
   const removeRoute = (index) => {
     const updated = selectedRoutes.filter((_, i) => i !== index);
-    setSelectedRoutes(updated.map((r, i) => ({ ...r, order: i + 1 })));
+    setSelectedRoutes(updated.map((r, i) => ({
+      ...r,
+      order: i + 1
+    })));
   };
 
   const savePlan = async () => {
 
-    if (!planName || selectedRoutes.length === 0) {
+    if (!planName.trim() || selectedRoutes.length === 0) {
       alert("Fill all fields");
       return;
     }
 
-    await axios.post("https://patrolsense-backend.onrender.com/api/plans", {
-      planName,
-      routes: selectedRoutes
-    });
+    try {
+      await axios.post("https://patrolsense-backend.onrender.com/api/plans", {
+        planName,
+        routes: selectedRoutes
+      });
 
-    alert("Plan created");
+      alert("Plan created");
 
-    setPlanName("");
-    setSelectedRoutes([]);
-    setIsCreating(false);
+      setPlanName("");
+      setSelectedRoutes([]);
+      setIsCreating(false);
 
-    fetchPlans();
+      fetchPlans();
+
+    } catch (err) {
+      console.log(err);
+      alert("Error creating plan");
+    }
   };
 
   return (
@@ -74,7 +91,7 @@ function CreatePlan() {
 
         <h2 style={title}>Patrol Plans</h2>
 
-        {/* ================= LIST VIEW ================= */}
+        {/* LIST VIEW */}
         {!isCreating && (
 
           <div>
@@ -85,11 +102,15 @@ function CreatePlan() {
 
             <div style={{ marginTop: 20 }}>
 
+              {plans.length === 0 && (
+                <p style={subText}>No plans created yet</p>
+              )}
+
               {plans.map(p => (
                 <div key={p._id} style={card}>
                   <strong>{p.planName}</strong>
                   <div style={subText}>
-                    {p.routes.length} routes
+                    {p.routes?.length || 0} routes
                   </div>
                 </div>
               ))}
@@ -100,7 +121,7 @@ function CreatePlan() {
 
         )}
 
-        {/* ================= CREATE VIEW ================= */}
+        {/* CREATE VIEW */}
         {isCreating && (
 
           <div>
@@ -135,7 +156,7 @@ function CreatePlan() {
 
               </div>
 
-              {/* SELECTED */}
+              {/* SELECTED ROUTES */}
               <div style={card}>
                 <h3 style={section}>
                   Selected ({selectedRoutes.length})
@@ -171,7 +192,15 @@ function CreatePlan() {
 
 /* STYLES */
 
-const title = { marginBottom: 20 };
+const title = {
+  marginBottom: "20px"
+};
+
+const section = {
+  marginBottom: "10px",
+  color: "#cbd5f5",
+  fontWeight: "600"
+};
 
 const card = {
   background: "#1e293b",
@@ -207,7 +236,8 @@ const addBtn = {
   border: "none",
   color: "white",
   padding: "5px 10px",
-  borderRadius: "6px"
+  borderRadius: "6px",
+  cursor: "pointer"
 };
 
 const removeBtn = {
@@ -215,7 +245,8 @@ const removeBtn = {
   border: "none",
   color: "white",
   padding: "5px 10px",
-  borderRadius: "6px"
+  borderRadius: "6px",
+  cursor: "pointer"
 };
 
 const mainBtn = {
@@ -224,7 +255,8 @@ const mainBtn = {
   padding: "10px 15px",
   borderRadius: "8px",
   color: "white",
-  cursor: "pointer"
+  cursor: "pointer",
+  marginTop: "10px"
 };
 
 const backBtn = {
