@@ -3,25 +3,27 @@ import Sidebar from "./Sidebar";
 
 function Layout({ children }) {
 
-  const [open, setOpen] = useState(true); // keep sidebar always visible
+  const [open, setOpen] = useState(true);
 
   return (
 
     <div style={container}>
 
       {/* SIDEBAR */}
-      <Sidebar />
+      {open && <Sidebar />}
 
-      {/* MAIN AREA */}
+      {/* MAIN */}
       <div style={main}>
 
         {/* TOP BAR */}
         <div style={topbar}>
+
           <button onClick={() => setOpen(!open)} style={menuBtn}>
             ☰
           </button>
 
           <h2 style={{ margin: 0 }}>PatrolSense</h2>
+
         </div>
 
         {/* CONTENT */}
