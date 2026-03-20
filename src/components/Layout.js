@@ -1,50 +1,35 @@
-import { NavLink } from "react-router-dom";
+import { useState } from "react";
+import Sidebar from "./Sidebar";
 
-function Sidebar() {
+function Layout({ children }) {
+
+  const [open, setOpen] = useState(true); // keep sidebar always visible
+
   return (
-    <div style={sidebar}>
 
-      <h3 style={title}>Menu</h3>
+    <div style={container}>
 
-      <ul style={menu}>
+      {/* SIDEBAR */}
+      <Sidebar />
 
-        <li>
-          <NavLink to="/routes" style={linkStyle}>
-            Routes
-          </NavLink>
-        </li>
+      {/* MAIN AREA */}
+      <div style={main}>
 
-        <li>
-          <NavLink to="/plans" style={linkStyle}>
-            Patrol Plans
-          </NavLink>
-        </li>
+        {/* TOP BAR */}
+        <div style={topbar}>
+          <button onClick={() => setOpen(!open)} style={menuBtn}>
+            ☰
+          </button>
 
-        <li>
-          <NavLink to="/users" style={linkStyle}>
-            Users
-          </NavLink>
-        </li>
+          <h2 style={{ margin: 0 }}>PatrolSense</h2>
+        </div>
 
-        <li>
-          <NavLink to="/assignments" style={linkStyle}>
-            Assignments
-          </NavLink>
-        </li>
+        {/* CONTENT */}
+        <div style={content}>
+          {children}
+        </div>
 
-        <li>
-          <NavLink to="/logs" style={linkStyle}>
-            Logs
-          </NavLink>
-        </li>
-
-        <li>
-          <NavLink to="/reports" style={linkStyle}>
-            Reports
-          </NavLink>
-        </li>
-
-      </ul>
+      </div>
 
     </div>
   );
@@ -52,38 +37,41 @@ function Sidebar() {
 
 /* STYLES */
 
-const sidebar = {
-  position: "fixed",
-  top: "60px", // below navbar
-  left: 0,
-  width: "220px",
-  height: "calc(100vh - 60px)",
+const container = {
+  display: "flex",
+  height: "100vh",
+  background: "#0f172a"
+};
+
+const main = {
+  flex: 1,
+  display: "flex",
+  flexDirection: "column"
+};
+
+const topbar = {
+  height: "60px",
   background: "#1e293b",
+  color: "white",
+  display: "flex",
+  alignItems: "center",
+  padding: "0 20px",
+  gap: "15px",
+  borderBottom: "1px solid #334155"
+};
+
+const menuBtn = {
+  fontSize: "20px",
+  background: "none",
+  border: "none",
+  color: "white",
+  cursor: "pointer"
+};
+
+const content = {
   padding: "20px",
-  color: "white",
-  borderRight: "1px solid #334155"
+  overflowY: "auto",
+  height: "calc(100vh - 60px)"
 };
 
-const title = {
-  marginBottom: "20px",
-  fontSize: "18px",
-  fontWeight: "bold"
-};
-
-const menu = {
-  listStyle: "none",
-  padding: 0
-};
-
-const linkStyle = ({ isActive }) => ({
-  display: "block",
-  padding: "10px",
-  marginBottom: "8px",
-  textDecoration: "none",
-  color: "white",
-  borderRadius: "6px",
-  background: isActive ? "#334155" : "transparent",
-  transition: "0.2s"
-});
-
-export default Sidebar;
+export default Layout;
