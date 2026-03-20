@@ -1,159 +1,158 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Layout from "../components/Layout";
 
-function Assignments() {
+function CreatePlan() {
 
-  const [guards, setGuards] = useState([]);
+  const [planName, setPlanName] = useState("");
   const [routes, setRoutes] = useState([]);
-  const [plans, setPlans] = useState([]);
-
-  const [guardId, setGuardId] = useState("");
-  const [date, setDate] = useState("");
-  const [shift, setShift] = useState("morning");
-
-  const [assignmentType, setAssignmentType] = useState("plan");
-
-  const [routeId, setRouteId] = useState("");
-  const [planId, setPlanId] = useState("");
+  const [selectedRoutes, setSelectedRoutes] = useState([]);
 
   useEffect(() => {
-    fetchData();
+    fetchRoutes();
   }, []);
 
-  const fetchData = async () => {
+  const fetchRoutes = async () => {
     try {
-      const usersRes = await axios.get("https://patrolsense-backend.onrender.com/api/users");
-      const routesRes = await axios.get("https://patrolsense-backend.onrender.com/api/routes");
-      const plansRes = await axios.get("https://patrolsense-backend.onrender.com/api/plans");
-
-      setGuards(usersRes.data.filter(u => u.role === "guard"));
-      setRoutes(routesRes.data);
-      setPlans(plansRes.data);
+      const res = await axios.get(
+        "https://patrolsense-backend.onrender.com/api/routes"
+      );
+      setRoutes(res.data);
     } catch (err) {
       console.log(err);
     }
   };
 
-  const createAssignment = async () => {
+  const addRoute = (route) => {
 
-    if (!guardId || !date) {
-      alert("Fill required fields");
+    if (selectedRoutes.find(r => r.routeId === route._id)) return;
+
+    const newRoute = {
+      routeId: route._id,
+      routeName: route.routeName,
+      order: selectedRoutes.length + 1
+    };
+
+    setSelectedRoutes(prev => [...prev, newRoute]);
+  };
+
+  const removeRoute = (index) => {
+
+    const updated = selectedRoutes.filter((_, i) => i !== index);
+
+    const reordered = updated.map((r, i) => ({
+      ...r,
+      order: i + 1
+    }));
+
+    setSelectedRoutes(reordered);
+  };
+
+  const savePlan = async () => {
+
+    if (!planName.trim()) {
+      alert("Enter plan name");
       return;
     }
 
-    const payload = {
-      guardId,
-      date,
-      shift,
-      planId: assignmentType === "plan" ? planId : null,
-      routeId: assignmentType === "route" ? routeId : null
-    };
+    if (selectedRoutes.length === 0) {
+      alert("Add routes to plan");
+      return;
+    }
 
     try {
+
       await axios.post(
-        "https://patrolsense-backend.onrender.com/api/assignments",
-        payload
+        "https://patrolsense-backend.onrender.com/api/plans",
+        {
+          planName,
+          routes: selectedRoutes
+        }
       );
 
-      alert("Assignment Created");
+      alert("Plan Created Successfully");
 
-      // reset
-      setGuardId("");
-      setDate("");
-      setShift("morning");
-      setPlanId("");
-      setRouteId("");
+      setPlanName("");
+      setSelectedRoutes([]);
 
     } catch (err) {
       console.log(err);
-      alert("Error creating assignment");
+      alert("Error creating plan");
     }
   };
 
   return (
 
-    <div>
+    <Layout>
 
-      <h2 style={title}>Create Assignment</h2>
+      <div>
 
-      {/* BASIC INFO */}
-      <div style={card}>
+        <h2 style={title}>Create Patrol Plan</h2>
 
-        <h3 style={section}>Basic Info</h3>
+        {/* PLAN NAME */}
+        <div style={card}>
+          <label>Plan Name</label>
+          <input
+            value={planName}
+            onChange={(e) => setPlanName(e.target.value)}
+            placeholder="Enter plan name"
+            style={input}
+          />
+        </div>
 
+        {/* MAIN GRID */}
         <div style={grid}>
 
-          <div>
-            <label>Guard</label>
-            <select value={guardId} onChange={(e) => setGuardId(e.target.value)} style={input}>
-              <option value="">Select Guard</option>
-              {guards.map(g => (
-                <option key={g._id} value={g._id}>{g.name}</option>
-              ))}
-            </select>
+          {/* AVAILABLE ROUTES */}
+          <div style={card}>
+            <h3 style={section}>Available Routes</h3>
+
+            {routes.map((r) => (
+              <div key={r._id} style={row}>
+
+                <span>{r.routeName}</span>
+
+                <button onClick={() => addRoute(r)} style={addBtn}>
+                  Add
+                </button>
+
+              </div>
+            ))}
+
           </div>
 
-          <div>
-            <label>Date</label>
-            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} style={input}/>
-          </div>
+          {/* SELECTED ROUTES */}
+          <div style={card}>
+            <h3 style={section}>
+              Routes in Plan ({selectedRoutes.length})
+            </h3>
 
-          <div>
-            <label>Shift</label>
-            <select value={shift} onChange={(e) => setShift(e.target.value)} style={input}>
-              <option value="morning">Morning</option>
-              <option value="evening">Evening</option>
-              <option value="night">Night</option>
-            </select>
+            {selectedRoutes.map((r, i) => (
+              <div key={i} style={row}>
+
+                <span>
+                  {r.order}. {r.routeName}
+                </span>
+
+                <button onClick={() => removeRoute(i)} style={removeBtn}>
+                  Remove
+                </button>
+
+              </div>
+            ))}
+
           </div>
 
         </div>
 
-      </div>
-
-      {/* TYPE */}
-      <div style={card}>
-
-        <h3 style={section}>Assignment Type</h3>
-
-        <select value={assignmentType} onChange={(e) => setAssignmentType(e.target.value)} style={input}>
-          <option value="plan">Patrol Plan</option>
-          <option value="route">Single Route</option>
-        </select>
+        {/* SAVE BUTTON */}
+        <button onClick={savePlan} style={mainBtn}>
+          Save Plan
+        </button>
 
       </div>
 
-      {/* SELECTION */}
-      <div style={card}>
-
-        <h3 style={section}>Selection</h3>
-
-        {assignmentType === "plan" && (
-          <select value={planId} onChange={(e) => setPlanId(e.target.value)} style={input}>
-            <option value="">Select Plan</option>
-            {plans.map(p => (
-              <option key={p._id} value={p._id}>{p.planName}</option>
-            ))}
-          </select>
-        )}
-
-        {assignmentType === "route" && (
-          <select value={routeId} onChange={(e) => setRouteId(e.target.value)} style={input}>
-            <option value="">Select Route</option>
-            {routes.map(r => (
-              <option key={r._id} value={r._id}>{r.routeName}</option>
-            ))}
-          </select>
-        )}
-
-      </div>
-
-      {/* BUTTON */}
-      <button onClick={createAssignment} style={btn}>
-        Create Assignment
-      </button>
-
-    </div>
+    </Layout>
   );
 }
 
@@ -178,8 +177,17 @@ const section = {
 
 const grid = {
   display: "grid",
-  gridTemplateColumns: "1fr 1fr 1fr",
-  gap: "15px"
+  gridTemplateColumns: "1fr 1fr",
+  gap: "20px"
+};
+
+const row = {
+  display: "flex",
+  justifyContent: "space-between",
+  padding: "10px",
+  background: "#334155",
+  borderRadius: "6px",
+  marginBottom: "10px"
 };
 
 const input = {
@@ -190,7 +198,25 @@ const input = {
   marginTop: "5px"
 };
 
-const btn = {
+const addBtn = {
+  background: "#22c55e",
+  border: "none",
+  color: "white",
+  padding: "6px 10px",
+  borderRadius: "6px",
+  cursor: "pointer"
+};
+
+const removeBtn = {
+  background: "#ef4444",
+  border: "none",
+  color: "white",
+  padding: "6px 10px",
+  borderRadius: "6px",
+  cursor: "pointer"
+};
+
+const mainBtn = {
   padding: "12px",
   background: "#22c55e",
   border: "none",
@@ -200,4 +226,4 @@ const btn = {
   fontSize: "16px"
 };
 
-export default Assignments;
+export default CreatePlan;

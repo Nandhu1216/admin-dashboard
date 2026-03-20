@@ -1,41 +1,50 @@
-import { useState } from "react";
-import Sidebar from "./Sidebar";
-import { Outlet } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
-function Layout() {
-  const [open, setOpen] = useState(true);
-
+function Sidebar() {
   return (
-    <div style={wrapper}>
+    <div style={sidebar}>
 
-      {/* NAVBAR */}
-      <div style={navbar}>
+      <h3 style={title}>Menu</h3>
 
-        <button onClick={() => setOpen(!open)} style={menuBtn}>
-          ☰
-        </button>
+      <ul style={menu}>
 
-        <h2 style={logo}>PatrolSense</h2>
+        <li>
+          <NavLink to="/routes" style={linkStyle}>
+            Routes
+          </NavLink>
+        </li>
 
-      </div>
+        <li>
+          <NavLink to="/plans" style={linkStyle}>
+            Patrol Plans
+          </NavLink>
+        </li>
 
-      {/* MAIN AREA */}
-      <div style={main}>
+        <li>
+          <NavLink to="/users" style={linkStyle}>
+            Users
+          </NavLink>
+        </li>
 
-        {/* SIDEBAR */}
-        {open && <Sidebar />}
+        <li>
+          <NavLink to="/assignments" style={linkStyle}>
+            Assignments
+          </NavLink>
+        </li>
 
-        {/* CONTENT */}
-        <div
-          style={{
-            ...content,
-            marginLeft: open ? "220px" : "0px"
-          }}
-        >
-          <Outlet />
-        </div>
+        <li>
+          <NavLink to="/logs" style={linkStyle}>
+            Logs
+          </NavLink>
+        </li>
 
-      </div>
+        <li>
+          <NavLink to="/reports" style={linkStyle}>
+            Reports
+          </NavLink>
+        </li>
+
+      </ul>
 
     </div>
   );
@@ -43,44 +52,38 @@ function Layout() {
 
 /* STYLES */
 
-const wrapper = {
-  background: "#0f172a",
-  minHeight: "100vh",
-  color: "white"
-};
-
-const navbar = {
-  height: "60px",
+const sidebar = {
+  position: "fixed",
+  top: "60px", // below navbar
+  left: 0,
+  width: "220px",
+  height: "calc(100vh - 60px)",
   background: "#1e293b",
-  display: "flex",
-  alignItems: "center",
-  padding: "0 20px",
-  position: "sticky",
-  top: 0,
-  zIndex: 100
-};
-
-const menuBtn = {
-  fontSize: "22px",
-  background: "none",
-  border: "none",
+  padding: "20px",
   color: "white",
-  cursor: "pointer"
+  borderRight: "1px solid #334155"
 };
 
-const logo = {
-  marginLeft: "15px",
+const title = {
+  marginBottom: "20px",
+  fontSize: "18px",
   fontWeight: "bold"
 };
 
-const main = {
-  display: "flex"
+const menu = {
+  listStyle: "none",
+  padding: 0
 };
 
-const content = {
-  flex: 1,
-  padding: "20px",
-  transition: "all 0.3s ease"
-};
+const linkStyle = ({ isActive }) => ({
+  display: "block",
+  padding: "10px",
+  marginBottom: "8px",
+  textDecoration: "none",
+  color: "white",
+  borderRadius: "6px",
+  background: isActive ? "#334155" : "transparent",
+  transition: "0.2s"
+});
 
-export default Layout;
+export default Sidebar;

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Layout from "../components/Layout";
 
 function Users() {
 
@@ -28,6 +29,12 @@ function Users() {
   };
 
   const addUser = async () => {
+
+    if (!form.name || !form.employeeId || !form.password) {
+      alert("Fill all fields");
+      return;
+    }
+
     try {
 
       await axios.post(
@@ -50,6 +57,9 @@ function Users() {
   };
 
   const deleteUser = async (id) => {
+
+    if (!window.confirm("Delete this user?")) return;
+
     try {
       await axios.delete(
         `https://patrolsense-backend.onrender.com/api/users/${id}`
@@ -62,84 +72,92 @@ function Users() {
 
   return (
 
-    <div>
+    <Layout>
 
-      <h2 style={title}>Users</h2>
+      <div>
 
-      {/* ADD USER */}
-      <div style={card}>
+        <h2 style={title}>Users</h2>
 
-        <h3 style={section}>Add User</h3>
+        {/* ADD USER */}
+        <div style={card}>
 
-        <div style={grid}>
+          <h3 style={section}>Add User</h3>
 
-          <input
-            placeholder="Name"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            style={input}
-          />
+          <div style={grid}>
 
-          <input
-            placeholder="Employee ID"
-            value={form.employeeId}
-            onChange={(e) => setForm({ ...form, employeeId: e.target.value })}
-            style={input}
-          />
+            <input
+              placeholder="Name"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              style={input}
+            />
 
-          <input
-            placeholder="Password"
-            type="password"
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-            style={input}
-          />
+            <input
+              placeholder="Employee ID"
+              value={form.employeeId}
+              onChange={(e) => setForm({ ...form, employeeId: e.target.value })}
+              style={input}
+            />
 
-          <select
-            value={form.role}
-            onChange={(e) => setForm({ ...form, role: e.target.value })}
-            style={input}
-          >
-            <option value="guard">Guard</option>
-            <option value="supervisor">Supervisor</option>
-          </select>
+            <input
+              placeholder="Password"
+              type="password"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              style={input}
+            />
+
+            <select
+              value={form.role}
+              onChange={(e) => setForm({ ...form, role: e.target.value })}
+              style={input}
+            >
+              <option value="guard">Guard</option>
+              <option value="supervisor">Supervisor</option>
+            </select>
+
+          </div>
+
+          <button onClick={addUser} style={addBtn}>
+            Add User
+          </button>
 
         </div>
 
-        <button onClick={addUser} style={addBtn}>
-          Add User
-        </button>
+        {/* USERS LIST */}
+        <div style={card}>
 
-      </div>
+          <h3 style={section}>All Users</h3>
 
-      {/* USERS LIST */}
-      <div style={card}>
+          {users.length === 0 && (
+            <p style={emptyText}>No users found</p>
+          )}
 
-        <h3 style={section}>All Users</h3>
+          {users.map((user) => (
+            <div key={user._id} style={row}>
 
-        {users.map((user) => (
-          <div key={user._id} style={row}>
-
-            <div>
-              <strong>{user.name}</strong>
-              <div style={subText}>
-                {user.employeeId} • {user.role}
+              <div>
+                <strong>{user.name}</strong>
+                <div style={subText}>
+                  {user.employeeId} • {user.role}
+                </div>
               </div>
+
+              <button
+                onClick={() => deleteUser(user._id)}
+                style={deleteBtn}
+              >
+                Delete
+              </button>
+
             </div>
+          ))}
 
-            <button
-              onClick={() => deleteUser(user._id)}
-              style={deleteBtn}
-            >
-              Delete
-            </button>
-
-          </div>
-        ))}
+        </div>
 
       </div>
 
-    </div>
+    </Layout>
   );
 }
 
@@ -196,6 +214,10 @@ const row = {
 
 const subText = {
   fontSize: "12px",
+  color: "#94a3b8"
+};
+
+const emptyText = {
   color: "#94a3b8"
 };
 

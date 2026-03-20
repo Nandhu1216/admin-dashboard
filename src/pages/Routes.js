@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Layout from "../components/Layout";
 
 function Routes() {
 
@@ -13,7 +14,9 @@ function Routes() {
 
   const fetchRoutes = async () => {
     try {
-      const res = await axios.get("https://patrolsense-backend.onrender.com/api/routes");
+      const res = await axios.get(
+        "https://patrolsense-backend.onrender.com/api/routes"
+      );
       setRoutes(res.data);
     } catch (err) {
       console.log(err);
@@ -33,55 +36,63 @@ function Routes() {
 
   return (
 
-    <div>
+    <Layout>
 
-      <h2 style={title}>Routes</h2>
+      <div>
 
-      {/* ROUTES LIST */}
-      <div style={card}>
+        <h2 style={title}>Routes</h2>
 
-        {routes.map((route) => (
-          <div key={route._id} style={routeRow}>
+        {/* ROUTES LIST */}
+        <div style={card}>
 
-            <div>
-              <strong>{route.routeName}</strong>
-              <div style={subText}>
-                {route.checkpoints?.length || 0} checkpoints
+          {routes.length === 0 && (
+            <p style={{ color: "#94a3b8" }}>No routes found</p>
+          )}
+
+          {routes.map((route) => (
+            <div key={route._id} style={routeRow}>
+
+              <div>
+                <strong>{route.routeName}</strong>
+                <div style={subText}>
+                  {route.checkpoints?.length || 0} checkpoints
+                </div>
               </div>
+
+              <div style={{ display: "flex", gap: "10px" }}>
+
+                <button
+                  onClick={() => navigate(`/routes/view/${route._id}`)}
+                  style={viewBtn}
+                >
+                  View
+                </button>
+
+                <button
+                  onClick={() => deleteRoute(route._id)}
+                  style={deleteBtn}
+                >
+                  Delete
+                </button>
+
+              </div>
+
             </div>
+          ))}
 
-            <div style={{ display: "flex", gap: "10px" }}>
+        </div>
 
-              <button
-                onClick={() => navigate(`/routes/view/${route._id}`)}
-                style={viewBtn}
-              >
-                View
-              </button>
-
-              <button
-                onClick={() => deleteRoute(route._id)}
-                style={deleteBtn}
-              >
-                Delete
-              </button>
-
-            </div>
-
-          </div>
-        ))}
+        {/* ADD BUTTON */}
+        <button
+          onClick={() => navigate("/routes/create")}
+          style={fab}
+        >
+          +
+        </button>
 
       </div>
 
-      {/* ADD BUTTON */}
-      <button
-        onClick={() => navigate("/routes/create")}
-        style={fab}
-      >
-        +
-      </button>
-
-    </div>
+    </Layout>
   );
 }
 

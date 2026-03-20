@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Layout from "../components/Layout";
 
 function CreatePlan() {
 
@@ -82,72 +83,76 @@ function CreatePlan() {
 
   return (
 
-    <div>
+    <Layout>
 
-      <h2 style={title}>Create Patrol Plan</h2>
+      <div>
 
-      {/* PLAN NAME */}
-      <div style={card}>
-        <label>Plan Name</label>
-        <input
-          value={planName}
-          onChange={(e) => setPlanName(e.target.value)}
-          placeholder="Enter plan name"
-          style={input}
-        />
-      </div>
+        <h2 style={title}>Create Patrol Plan</h2>
 
-      {/* MAIN GRID */}
-      <div style={grid}>
-
-        {/* AVAILABLE ROUTES */}
+        {/* PLAN NAME */}
         <div style={card}>
-          <h3 style={section}>Available Routes</h3>
+          <label>Plan Name</label>
+          <input
+            value={planName}
+            onChange={(e) => setPlanName(e.target.value)}
+            placeholder="Enter plan name"
+            style={input}
+          />
+        </div>
 
-          {routes.map((r) => (
-            <div key={r._id} style={row}>
+        {/* MAIN GRID */}
+        <div style={grid}>
 
-              <span>{r.routeName}</span>
+          {/* AVAILABLE ROUTES */}
+          <div style={card}>
+            <h3 style={section}>Available Routes</h3>
 
-              <button onClick={() => addRoute(r)} style={addBtn}>
-                Add
-              </button>
+            {routes.map((r) => (
+              <div key={r._id} style={row}>
 
-            </div>
-          ))}
+                <span>{r.routeName}</span>
+
+                <button onClick={() => addRoute(r)} style={addBtn}>
+                  Add
+                </button>
+
+              </div>
+            ))}
+
+          </div>
+
+          {/* SELECTED ROUTES */}
+          <div style={card}>
+            <h3 style={section}>
+              Routes in Plan ({selectedRoutes.length})
+            </h3>
+
+            {selectedRoutes.map((r, i) => (
+              <div key={i} style={row}>
+
+                <span>
+                  {r.order}. {r.routeName}
+                </span>
+
+                <button onClick={() => removeRoute(i)} style={removeBtn}>
+                  Remove
+                </button>
+
+              </div>
+            ))}
+
+          </div>
 
         </div>
 
-        {/* SELECTED ROUTES */}
-        <div style={card}>
-          <h3 style={section}>
-            Routes in Plan ({selectedRoutes.length})
-          </h3>
-
-          {selectedRoutes.map((r, i) => (
-            <div key={i} style={row}>
-
-              <span>
-                {r.order}. {r.routeName}
-              </span>
-
-              <button onClick={() => removeRoute(i)} style={removeBtn}>
-                Remove
-              </button>
-
-            </div>
-          ))}
-
-        </div>
+        {/* SAVE BUTTON */}
+        <button onClick={savePlan} style={mainBtn}>
+          Save Plan
+        </button>
 
       </div>
 
-      {/* SAVE BUTTON */}
-      <button onClick={savePlan} style={mainBtn}>
-        Save Plan
-      </button>
-
-    </div>
+    </Layout>
   );
 }
 
