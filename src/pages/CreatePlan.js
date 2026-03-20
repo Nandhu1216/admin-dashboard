@@ -4,81 +4,66 @@ import Layout from "../components/Layout";
 
 function CreatePlan() {
 
-  const [planName, setPlanName] = useState("");
+  const [plans, setPlans] = useState([]);
   const [routes, setRoutes] = useState([]);
+
+  const [isCreating, setIsCreating] = useState(false);
+
+  const [planName, setPlanName] = useState("");
   const [selectedRoutes, setSelectedRoutes] = useState([]);
 
   useEffect(() => {
+    fetchPlans();
     fetchRoutes();
   }, []);
 
+  const fetchPlans = async () => {
+    const res = await axios.get("https://patrolsense-backend.onrender.com/api/plans");
+    setPlans(res.data);
+  };
+
   const fetchRoutes = async () => {
-    try {
-      const res = await axios.get(
-        "https://patrolsense-backend.onrender.com/api/routes"
-      );
-      setRoutes(res.data);
-    } catch (err) {
-      console.log(err);
-    }
+    const res = await axios.get("https://patrolsense-backend.onrender.com/api/routes");
+    setRoutes(res.data);
   };
 
   const addRoute = (route) => {
-
     if (selectedRoutes.find(r => r.routeId === route._id)) return;
 
-    const newRoute = {
-      routeId: route._id,
-      routeName: route.routeName,
-      order: selectedRoutes.length + 1
-    };
-
-    setSelectedRoutes(prev => [...prev, newRoute]);
+    setSelectedRoutes(prev => [
+      ...prev,
+      {
+        routeId: route._id,
+        routeName: route.routeName,
+        order: prev.length + 1
+      }
+    ]);
   };
 
   const removeRoute = (index) => {
-
     const updated = selectedRoutes.filter((_, i) => i !== index);
-
-    const reordered = updated.map((r, i) => ({
-      ...r,
-      order: i + 1
-    }));
-
-    setSelectedRoutes(reordered);
+    setSelectedRoutes(updated.map((r, i) => ({ ...r, order: i + 1 })));
   };
 
   const savePlan = async () => {
 
-    if (!planName.trim()) {
-      alert("Enter plan name");
+    if (!planName || selectedRoutes.length === 0) {
+      alert("Fill all fields");
       return;
     }
 
-    if (selectedRoutes.length === 0) {
-      alert("Add routes to plan");
-      return;
-    }
+    await axios.post("https://patrolsense-backend.onrender.com/api/plans", {
+      planName,
+      routes: selectedRoutes
+    });
 
-    try {
+    alert("Plan created");
 
-      await axios.post(
-        "https://patrolsense-backend.onrender.com/api/plans",
-        {
-          planName,
-          routes: selectedRoutes
-        }
-      );
+    setPlanName("");
+    setSelectedRoutes([]);
+    setIsCreating(false);
 
-      alert("Plan Created Successfully");
-
-      setPlanName("");
-      setSelectedRoutes([]);
-
-    } catch (err) {
-      console.log(err);
-      alert("Error creating plan");
-    }
+    fetchPlans();
   };
 
   return (
@@ -87,68 +72,95 @@ function CreatePlan() {
 
       <div>
 
-        <h2 style={title}>Create Patrol Plan</h2>
+        <h2 style={title}>Patrol Plans</h2>
 
-        {/* PLAN NAME */}
-        <div style={card}>
-          <label>Plan Name</label>
-          <input
-            value={planName}
-            onChange={(e) => setPlanName(e.target.value)}
-            placeholder="Enter plan name"
-            style={input}
-          />
-        </div>
+        {/* ================= LIST VIEW ================= */}
+        {!isCreating && (
 
-        {/* MAIN GRID */}
-        <div style={grid}>
+          <div>
 
-          {/* AVAILABLE ROUTES */}
-          <div style={card}>
-            <h3 style={section}>Available Routes</h3>
+            <button onClick={() => setIsCreating(true)} style={mainBtn}>
+              + Create Plan
+            </button>
 
-            {routes.map((r) => (
-              <div key={r._id} style={row}>
+            <div style={{ marginTop: 20 }}>
 
-                <span>{r.routeName}</span>
+              {plans.map(p => (
+                <div key={p._id} style={card}>
+                  <strong>{p.planName}</strong>
+                  <div style={subText}>
+                    {p.routes.length} routes
+                  </div>
+                </div>
+              ))}
 
-                <button onClick={() => addRoute(r)} style={addBtn}>
-                  Add
-                </button>
-
-              </div>
-            ))}
+            </div>
 
           </div>
 
-          {/* SELECTED ROUTES */}
-          <div style={card}>
-            <h3 style={section}>
-              Routes in Plan ({selectedRoutes.length})
-            </h3>
+        )}
 
-            {selectedRoutes.map((r, i) => (
-              <div key={i} style={row}>
+        {/* ================= CREATE VIEW ================= */}
+        {isCreating && (
 
-                <span>
-                  {r.order}. {r.routeName}
-                </span>
+          <div>
 
-                <button onClick={() => removeRoute(i)} style={removeBtn}>
-                  Remove
-                </button>
+            <button onClick={() => setIsCreating(false)} style={backBtn}>
+              ← Back
+            </button>
+
+            <div style={card}>
+              <input
+                placeholder="Plan Name"
+                value={planName}
+                onChange={(e) => setPlanName(e.target.value)}
+                style={input}
+              />
+            </div>
+
+            <div style={grid}>
+
+              {/* AVAILABLE ROUTES */}
+              <div style={card}>
+                <h3 style={section}>Available Routes</h3>
+
+                {routes.map(r => (
+                  <div key={r._id} style={row}>
+                    <span>{r.routeName}</span>
+                    <button onClick={() => addRoute(r)} style={addBtn}>
+                      Add
+                    </button>
+                  </div>
+                ))}
 
               </div>
-            ))}
+
+              {/* SELECTED */}
+              <div style={card}>
+                <h3 style={section}>
+                  Selected ({selectedRoutes.length})
+                </h3>
+
+                {selectedRoutes.map((r, i) => (
+                  <div key={i} style={row}>
+                    <span>{r.order}. {r.routeName}</span>
+                    <button onClick={() => removeRoute(i)} style={removeBtn}>
+                      Remove
+                    </button>
+                  </div>
+                ))}
+
+              </div>
+
+            </div>
+
+            <button onClick={savePlan} style={mainBtn}>
+              Save Plan
+            </button>
 
           </div>
 
-        </div>
-
-        {/* SAVE BUTTON */}
-        <button onClick={savePlan} style={mainBtn}>
-          Save Plan
-        </button>
+        )}
 
       </div>
 
@@ -159,20 +171,13 @@ function CreatePlan() {
 
 /* STYLES */
 
-const title = {
-  marginBottom: "20px"
-};
+const title = { marginBottom: 20 };
 
 const card = {
   background: "#1e293b",
-  padding: "20px",
-  borderRadius: "12px",
-  marginBottom: "20px"
-};
-
-const section = {
-  marginBottom: "10px",
-  color: "#cbd5f5"
+  padding: "15px",
+  borderRadius: "10px",
+  marginBottom: "10px"
 };
 
 const grid = {
@@ -184,46 +189,57 @@ const grid = {
 const row = {
   display: "flex",
   justifyContent: "space-between",
-  padding: "10px",
+  padding: "8px",
   background: "#334155",
   borderRadius: "6px",
-  marginBottom: "10px"
+  marginBottom: "8px"
 };
 
 const input = {
   width: "100%",
   padding: "10px",
   borderRadius: "6px",
-  border: "none",
-  marginTop: "5px"
+  border: "none"
 };
 
 const addBtn = {
   background: "#22c55e",
   border: "none",
   color: "white",
-  padding: "6px 10px",
-  borderRadius: "6px",
-  cursor: "pointer"
+  padding: "5px 10px",
+  borderRadius: "6px"
 };
 
 const removeBtn = {
   background: "#ef4444",
   border: "none",
   color: "white",
-  padding: "6px 10px",
+  padding: "5px 10px",
+  borderRadius: "6px"
+};
+
+const mainBtn = {
+  background: "#22c55e",
+  border: "none",
+  padding: "10px 15px",
+  borderRadius: "8px",
+  color: "white",
+  cursor: "pointer"
+};
+
+const backBtn = {
+  marginBottom: "10px",
+  background: "#475569",
+  color: "white",
+  border: "none",
+  padding: "8px 12px",
   borderRadius: "6px",
   cursor: "pointer"
 };
 
-const mainBtn = {
-  padding: "12px",
-  background: "#22c55e",
-  border: "none",
-  color: "white",
-  borderRadius: "8px",
-  cursor: "pointer",
-  fontSize: "16px"
+const subText = {
+  fontSize: "12px",
+  color: "#94a3b8"
 };
 
 export default CreatePlan;
