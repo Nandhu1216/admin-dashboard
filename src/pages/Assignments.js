@@ -9,16 +9,15 @@ function Assignments() {
   const [assignments, setAssignments] = useState([]);
 
   const [routes, setRoutes] = useState([]);
-  const [plans, setPlans] = useState([]);
 
   const [showForm, setShowForm] = useState(false);
 
   const [date, setDate] = useState("");
   const [shift, setShift] = useState("morning");
-  const [assignmentType, setAssignmentType] = useState("plan");
 
-  const [routeId, setRouteId] = useState("");
-  const [planId, setPlanId] = useState("");
+  // 🔥 NEW
+  const [selectedRoutes, setSelectedRoutes] = useState([]);
+  const [selectedRouteId, setSelectedRouteId] = useState("");
 
   useEffect(() => {
     loadInitialData();
@@ -27,11 +26,9 @@ function Assignments() {
   const loadInitialData = async () => {
     const users = await axios.get("https://patrolsense-backend.onrender.com/api/users");
     const routesRes = await axios.get("https://patrolsense-backend.onrender.com/api/routes");
-    const plansRes = await axios.get("https://patrolsense-backend.onrender.com/api/plans");
 
     setGuards(users.data.filter(u => u.role === "guard"));
     setRoutes(routesRes.data);
-    setPlans(plansRes.data);
   };
 
   const loadAssignments = async (guardId) => {
@@ -46,14 +43,43 @@ function Assignments() {
     loadAssignments(g._id);
   };
 
+  // ===============================
+  // 🔥 ADD ROUTE
+  // ===============================
+  const addRoute = () => {
+
+    if (!selectedRouteId) return;
+
+    const route = routes.find(r => r._id === selectedRouteId);
+
+    // prevent duplicate
+    if (selectedRoutes.some(r => r.routeId === route._id)) return;
+
+    setSelectedRoutes([
+      ...selectedRoutes,
+      { routeId: route._id, routeName: route.routeName }
+    ]);
+  };
+
+  // ===============================
+  // 🔥 REMOVE ROUTE
+  // ===============================
+  const removeRoute = (index) => {
+    const updated = [...selectedRoutes];
+    updated.splice(index, 1);
+    setSelectedRoutes(updated);
+  };
+
+  // ===============================
+  // 🔥 CREATE ASSIGNMENT
+  // ===============================
   const createAssignment = async () => {
 
     const payload = {
       guardId: selectedGuard._id,
       date,
       shift,
-      planId: assignmentType === "plan" ? planId : null,
-      routeId: assignmentType === "route" ? routeId : null
+      routes: selectedRoutes   // 🔥 ARRAY
     };
 
     await axios.post(
@@ -64,9 +90,8 @@ function Assignments() {
     alert("Assignment Created");
 
     setShowForm(false);
+    setSelectedRoutes([]);
     setDate("");
-    setPlanId("");
-    setRouteId("");
 
     loadAssignments(selectedGuard._id);
   };
@@ -76,7 +101,9 @@ function Assignments() {
 
       <h2>Assignments</h2>
 
-      {/* GUARDS */}
+      {/* ===============================
+          GUARD LIST
+      =============================== */}
       {!selectedGuard && (
         <div style={card}>
           {guards.map(g => (
@@ -87,7 +114,9 @@ function Assignments() {
         </div>
       )}
 
-      {/* ASSIGNMENT VIEW */}
+      {/* ===============================
+          ASSIGNMENT VIEW
+      =============================== */}
       {selectedGuard && !showForm && (
         <>
           <button onClick={() => setSelectedGuard(null)}>← Back</button>
@@ -96,15 +125,15 @@ function Assignments() {
 
           <button onClick={() => setShowForm(true)}>+ Assign</button>
 
-          {assignments.map(a => (
-            <div key={a._id} style={card}>
+          {assignments.map((a, i) => (
+            <div key={i} style={card}>
 
               <b>{a.shift}</b> ({a.date})
 
               {a.routes
-                .sort((a,b)=>a.order-b.order)
-                .map(r => (
-                  <div key={r.routeId}>
+                ?.sort((a, b) => a.order - b.order)
+                .map((r, index) => (
+                  <div key={index}>
                     {r.order}. {r.routeName}
                   </div>
                 ))
@@ -115,39 +144,45 @@ function Assignments() {
         </>
       )}
 
-      {/* CREATE FORM */}
+      {/* ===============================
+          CREATE FORM
+      =============================== */}
       {showForm && (
         <>
           <button onClick={() => setShowForm(false)}>← Back</button>
 
-          <input type="date" onChange={e=>setDate(e.target.value)} />
+          <input type="date" onChange={e => setDate(e.target.value)} />
 
-          <select onChange={e=>setShift(e.target.value)}>
+          <select onChange={e => setShift(e.target.value)}>
             <option>morning</option>
             <option>evening</option>
             <option>night</option>
           </select>
 
-          <select onChange={e=>setAssignmentType(e.target.value)}>
-            <option value="plan">Plan</option>
-            <option value="route">Route</option>
+          {/* SELECT ROUTE */}
+          <select onChange={e => setSelectedRouteId(e.target.value)}>
+            <option value="">Select Route</option>
+            {routes.map(r => (
+              <option key={r._id} value={r._id}>
+                {r.routeName}
+              </option>
+            ))}
           </select>
 
-          {assignmentType === "plan" && (
-            <select onChange={e=>setPlanId(e.target.value)}>
-              {plans.map(p=>(
-                <option key={p._id} value={p._id}>{p.planName}</option>
-              ))}
-            </select>
-          )}
+          <button onClick={addRoute}>+ Add Route</button>
 
-          {assignmentType === "route" && (
-            <select onChange={e=>setRouteId(e.target.value)}>
-              {routes.map(r=>(
-                <option key={r._id} value={r._id}>{r.routeName}</option>
-              ))}
-            </select>
-          )}
+          {/* SELECTED ROUTES */}
+          <div style={card}>
+            <h4>Selected Routes</h4>
+
+            {selectedRoutes.map((r, index) => (
+              <div key={index} style={{ display: "flex", justifyContent: "space-between" }}>
+                <span>{index + 1}. {r.routeName}</span>
+
+                <button onClick={() => removeRoute(index)}>❌</button>
+              </div>
+            ))}
+          </div>
 
           <button onClick={createAssignment}>Save</button>
         </>
