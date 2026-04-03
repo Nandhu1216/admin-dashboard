@@ -10,6 +10,7 @@ function Users() {
     name: "",
     employeeId: "",
     password: "",
+    phone: "", // ✅ NEW FIELD
     role: "guard"
   });
 
@@ -30,8 +31,15 @@ function Users() {
 
   const addUser = async () => {
 
-    if (!form.name || !form.employeeId || !form.password) {
+    // ✅ Validation
+    if (!form.name || !form.employeeId || !form.password || !form.phone) {
       alert("Fill all fields");
+      return;
+    }
+
+    // ✅ Phone format check
+    if (!form.phone.startsWith("+91")) {
+      alert("Phone must start with +91");
       return;
     }
 
@@ -42,10 +50,12 @@ function Users() {
         form
       );
 
+      // ✅ Reset form
       setForm({
         name: "",
         employeeId: "",
         password: "",
+        phone: "",
         role: "guard"
       });
 
@@ -107,6 +117,13 @@ function Users() {
               style={input}
             />
 
+            <input
+              placeholder="Phone (+91XXXXXXXXXX)"
+              value={form.phone}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              style={input}
+            />
+
             <select
               value={form.role}
               onChange={(e) => setForm({ ...form, role: e.target.value })}
@@ -139,7 +156,7 @@ function Users() {
               <div>
                 <strong>{user.name}</strong>
                 <div style={subText}>
-                  {user.employeeId} • {user.role}
+                  {user.employeeId} • {user.role} • {user.phone || "No phone"}
                 </div>
               </div>
 
