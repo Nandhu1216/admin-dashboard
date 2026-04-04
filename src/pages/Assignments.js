@@ -9,13 +9,11 @@ function Assignments() {
   const [assignments, setAssignments] = useState([]);
 
   const [routes, setRoutes] = useState([]);
-
   const [showForm, setShowForm] = useState(false);
 
   const [date, setDate] = useState("");
   const [shift, setShift] = useState("morning");
 
-  // 🔥 NEW
   const [selectedRoutes, setSelectedRoutes] = useState([]);
   const [selectedRouteId, setSelectedRouteId] = useState("");
 
@@ -43,16 +41,11 @@ function Assignments() {
     loadAssignments(g._id);
   };
 
-  // ===============================
-  // 🔥 ADD ROUTE
-  // ===============================
   const addRoute = () => {
-
     if (!selectedRouteId) return;
 
     const route = routes.find(r => r._id === selectedRouteId);
 
-    // prevent duplicate
     if (selectedRoutes.some(r => r.routeId === route._id)) return;
 
     setSelectedRoutes([
@@ -61,25 +54,18 @@ function Assignments() {
     ]);
   };
 
-  // ===============================
-  // 🔥 REMOVE ROUTE
-  // ===============================
   const removeRoute = (index) => {
     const updated = [...selectedRoutes];
     updated.splice(index, 1);
     setSelectedRoutes(updated);
   };
 
-  // ===============================
-  // 🔥 CREATE ASSIGNMENT
-  // ===============================
   const createAssignment = async () => {
-
     const payload = {
       guardId: selectedGuard._id,
       date,
       shift,
-      routes: selectedRoutes   // 🔥 ARRAY
+      routes: selectedRoutes
     };
 
     await axios.post(
@@ -99,92 +85,128 @@ function Assignments() {
   return (
     <Layout>
 
-      <h2>Assignments</h2>
+      <h2 style={{ marginBottom: "20px", color: "#e2e8f0", letterSpacing: "1px" }}>
+        Assignments
+      </h2>
 
-      {/* ===============================
-          GUARD LIST
-      =============================== */}
+      {/* GUARD LIST */}
       {!selectedGuard && (
         <div style={card}>
           {guards.map(g => (
-            <div key={g._id} style={row} onClick={() => selectGuard(g)}>
+            <div
+              key={g._id}
+              style={row}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = "#334155";
+                e.currentTarget.style.transform = "scale(1.02)";
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = "#1e293b";
+                e.currentTarget.style.transform = "scale(1)";
+              }}
+              onClick={() => selectGuard(g)}
+            >
               {g.name}
             </div>
           ))}
         </div>
       )}
 
-      {/* ===============================
-          ASSIGNMENT VIEW
-      =============================== */}
+      {/* ASSIGNMENT VIEW */}
       {selectedGuard && !showForm && (
         <>
-          <button onClick={() => setSelectedGuard(null)}>← Back</button>
+          <button style={buttonStyle} onClick={() => setSelectedGuard(null)}>
+            ← Back
+          </button>
 
-          <h3>{selectedGuard.name}</h3>
+          <h3 style={{ marginTop: "10px", color: "#e2e8f0" }}>
+            {selectedGuard.name}
+          </h3>
 
-          <button onClick={() => setShowForm(true)}>+ Assign</button>
+          <button style={buttonStyle} onClick={() => setShowForm(true)}>
+            + Assign
+          </button>
 
           {assignments.map((a, i) => (
             <div key={i} style={card}>
-
               <b>{a.shift}</b> ({a.date})
 
               {a.routes
                 ?.sort((a, b) => a.order - b.order)
                 .map((r, index) => (
-                  <div key={index}>
+                  <div key={index} style={{ marginTop: "5px", color: "#cbd5f5" }}>
                     {r.order}. {r.routeName}
                   </div>
                 ))
               }
-
             </div>
           ))}
         </>
       )}
 
-      {/* ===============================
-          CREATE FORM
-      =============================== */}
+      {/* CREATE FORM */}
       {showForm && (
         <>
-          <button onClick={() => setShowForm(false)}>← Back</button>
+          <button style={buttonStyle} onClick={() => setShowForm(false)}>
+            ← Back
+          </button>
 
-          <input type="date" onChange={e => setDate(e.target.value)} />
+          <div style={{ marginTop: "10px" }}>
+            <input
+              style={inputStyle}
+              type="date"
+              onChange={e => setDate(e.target.value)}
+            />
 
-          <select onChange={e => setShift(e.target.value)}>
-            <option>morning</option>
-            <option>evening</option>
-            <option>night</option>
-          </select>
+            <select style={inputStyle} onChange={e => setShift(e.target.value)}>
+              <option>morning</option>
+              <option>evening</option>
+              <option>night</option>
+            </select>
+          </div>
 
           {/* SELECT ROUTE */}
-          <select onChange={e => setSelectedRouteId(e.target.value)}>
-            <option value="">Select Route</option>
-            {routes.map(r => (
-              <option key={r._id} value={r._id}>
-                {r.routeName}
-              </option>
-            ))}
-          </select>
+          <div style={{ marginTop: "10px" }}>
+            <select style={inputStyle} onChange={e => setSelectedRouteId(e.target.value)}>
+              <option value="">Select Route</option>
+              {routes.map(r => (
+                <option key={r._id} value={r._id}>
+                  {r.routeName}
+                </option>
+              ))}
+            </select>
 
-          <button onClick={addRoute}>+ Add Route</button>
+            <button style={buttonStyle} onClick={addRoute}>
+              + Add Route
+            </button>
+          </div>
 
           {/* SELECTED ROUTES */}
           <div style={card}>
-            <h4>Selected Routes</h4>
+            <h4 style={{ color: "#e2e8f0" }}>Selected Routes</h4>
 
             {selectedRoutes.map((r, index) => (
-              <div key={index} style={{ display: "flex", justifyContent: "space-between" }}>
+              <div
+                key={index}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginTop: "10px",
+                  color: "#cbd5f5"
+                }}
+              >
                 <span>{index + 1}. {r.routeName}</span>
 
-                <button onClick={() => removeRoute(index)}>❌</button>
+                <button style={dangerBtn} onClick={() => removeRoute(index)}>
+                  ❌
+                </button>
               </div>
             ))}
           </div>
 
-          <button onClick={createAssignment}>Save</button>
+          <button style={buttonStyle} onClick={createAssignment}>
+            Save
+          </button>
         </>
       )}
 
@@ -192,17 +214,59 @@ function Assignments() {
   );
 }
 
+/* ================= STYLES ================= */
+
 const card = {
-  background: "#1e293b",
-  padding: "10px",
-  marginBottom: "10px"
+  background: "linear-gradient(145deg, #0f172a, #020617)",
+  padding: "18px",
+  marginBottom: "18px",
+  borderRadius: "16px",
+  border: "1px solid #1e293b",
+  boxShadow: "0 8px 25px rgba(0,0,0,0.4)",
+  transition: "0.3s ease"
 };
 
 const row = {
-  padding: "10px",
-  background: "#334155",
-  marginBottom: "8px",
-  cursor: "pointer"
+  padding: "16px",
+  background: "#1e293b",
+  marginBottom: "12px",
+  borderRadius: "12px",
+  cursor: "pointer",
+  transition: "all 0.25s ease"
+};
+
+const buttonStyle = {
+  padding: "10px 18px",
+  borderRadius: "10px",
+  border: "none",
+  background: "linear-gradient(135deg, #3b82f6, #2563eb)",
+  color: "#fff",
+  cursor: "pointer",
+  marginTop: "12px",
+  fontWeight: "600",
+  transition: "all 0.2s ease",
+  boxShadow: "0 4px 12px rgba(59,130,246,0.3)"
+};
+
+const inputStyle = {
+  padding: "12px",
+  marginTop: "10px",
+  marginRight: "10px",
+  borderRadius: "10px",
+  border: "1px solid #334155",
+  background: "#020617",
+  color: "#fff",
+  outline: "none"
+};
+
+const dangerBtn = {
+  background: "linear-gradient(135deg, #ef4444, #dc2626)",
+  border: "none",
+  padding: "6px 12px",
+  borderRadius: "8px",
+  color: "#fff",
+  cursor: "pointer",
+  fontWeight: "600"
 };
 
 export default Assignments;
