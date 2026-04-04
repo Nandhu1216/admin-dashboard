@@ -61,7 +61,7 @@ const sidebar = {
   background: "#1e293b",
   padding: "20px",
   color: "white",
-  borderRight: "1px solid #334155"
+  borderRight: "1px solid #6da0e9"
 };
 
 const title = {
@@ -82,7 +82,7 @@ const linkStyle = ({ isActive }) => ({
   textDecoration: "none",
   color: "white",
   borderRadius: "6px",
-  background: isActive ? "#334155" : "transparent",
+  background: isActive ? "#6ea5f4" : "transparent",
   transition: "0.2s"
 });
 

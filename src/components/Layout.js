@@ -42,7 +42,7 @@ function Layout({ children }) {
 const container = {
   display: "flex",
   height: "100vh",
-  background: "#0f172a"
+  background: "#6089ea"
 };
 
 const main = {
@@ -53,13 +53,13 @@ const main = {
 
 const topbar = {
   height: "60px",
-  background: "#1e293b",
+  background: "rgb(82, 133, 216)",
   color: "white",
   display: "flex",
   alignItems: "center",
   padding: "0 20px",
   gap: "15px",
-  borderBottom: "1px solid #334155"
+  borderBottom: "1px solid #6ca6f8"
 };
 
 const menuBtn = {
