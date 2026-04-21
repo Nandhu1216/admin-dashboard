@@ -53,7 +53,7 @@ function Reports() {
             </div>
 
             <div style={durationBox}>
-              ⌛ Duration: {r.duration} sec
+              ⌛ Duration: {r.durationText}
             </div>
 
           </div>
