@@ -32,7 +32,9 @@ function Reports() {
         <h2 style={title}>Patrol Reports</h2>
 
         {reports.length === 0 && (
-          <p style={{ color: "#94a3b8" }}>No Reports Yet</p>
+          <p style={emptyText}>
+            No patrol reports available yet
+          </p>
         )}
 
         {reports.map(r => (
@@ -43,17 +45,30 @@ function Reports() {
             </h3>
 
             <div style={infoRow}>
-              <span>👮 {r.guardId?.name}</span>
-              <span>📅 {r.date}</span>
+              <span>👮 {r.guardId?.name || "Unknown"}</span>
+              <span>📅 {r.date || "-"}</span>
             </div>
 
             <div style={infoRow}>
-              <span>⏱ Start: {new Date(r.startTime).toLocaleTimeString()}</span>
-              <span>⏱ End: {new Date(r.endTime).toLocaleTimeString()}</span>
+              <span>
+                ⏱ Start: {
+                  r.startTime
+                    ? new Date(r.startTime).toLocaleTimeString()
+                    : "-"
+                }
+              </span>
+
+              <span>
+                ⏱ End: {
+                  r.endTime
+                    ? new Date(r.endTime).toLocaleTimeString()
+                    : "-"
+                }
+              </span>
             </div>
 
             <div style={durationBox}>
-              ⌛ Duration: {r.durationText}
+              ⌛ Duration: {r.durationText || "0 min 0 sec"}
             </div>
 
           </div>
@@ -81,6 +96,12 @@ const title = {
   letterSpacing: "1px"
 };
 
+const emptyText = {
+  color: "#94a3b8",
+  textAlign: "center",
+  marginTop: "40px"
+};
+
 const card = {
   background: "linear-gradient(145deg, #0f172a, #020617)",
   color: "#fff",
@@ -89,7 +110,8 @@ const card = {
   borderRadius: "16px",
   border: "1px solid #1e293b",
   boxShadow: "0 8px 25px rgba(0,0,0,0.4)",
-  transition: "0.3s ease"
+  transition: "0.3s ease",
+  cursor: "pointer"
 };
 
 const routeTitle = {
